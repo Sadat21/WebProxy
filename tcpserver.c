@@ -2,7 +2,8 @@
  * tcpserver.c
  *
  *  Created on: Jan 16, 2018
- *      Author: reza
+ *  Author: reza and Sadat Islam
+ *	Client Template used from Reza, but the rest was done by Sadat Islam
  */
 
 #include <stdio.h>

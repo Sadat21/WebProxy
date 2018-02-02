@@ -270,6 +270,9 @@ int main() {
 				} else {
 					printf("## Receiving web server's HTTP response: done ##\n");
 				}
+
+				printf("Message recieved: %s\n", w_message_in);
+
 				//Read the bytes
 				char maxBytes[1024] = "-1";
 
@@ -292,6 +295,7 @@ int main() {
 				//If there is no maxBytes value in the request
 				if (strcmp(maxBytes, "-1") == 0) {
 					printf("There is no reference to the number of bytes, hence I will loop and then deliver the message.\n");
+					printf("%s\n", maxBytes );
 					int x;
 					for(x = 0; x < 100000; x++){}
 					//Send response
@@ -305,19 +309,22 @@ int main() {
 						exit(-1);
 					} else {
 						printf("## Sending HTTP response to the client: done ##\n");
+						printf("%s\n", w_message_in_copy );
 					}
 				}
 				//If you know the max bytes, then just ask for some at a time
 				else{
 					printf("To be finished\n");
 					printf("%s\n", maxBytes );
+					strcat(s_message_out, "Range: bytes=0-100\r\n");
+					printf("To be sent to the server: %s\n",s_message_out);
+
 
 
 				}
 
 				/* Closing the socket connection with the web server */
 				close(web_sock);
-				exit(1);
 			}
 
 

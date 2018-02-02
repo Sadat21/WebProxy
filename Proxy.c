@@ -29,6 +29,8 @@
 /* Clean exit! */
 #include <signal.h>
 
+#include <unistd.h>
+
 int lstn_sock;
 
 /* The function will run after catching Ctrl+c in terminal */
@@ -271,7 +273,6 @@ int main() {
 					printf("## Receiving web server's HTTP response: done ##\n");
 				}
 
-				printf("Message recieved: %s\n", w_message_in);
 
 				//Read the bytes
 				char maxBytes[1024] = "-1";
@@ -293,12 +294,44 @@ int main() {
 				}
 
 				//If there is no maxBytes value in the request
-				if (strcmp(maxBytes, "-1") == 0) {
-					printf("There is no reference to the number of bytes, hence I will loop and then deliver the message.\n");
-					printf("%s\n", maxBytes );
-					int x;
-					for(x = 0; x < 100000; x++){}
+				if (strcmp(maxBytes, "-1") == 0) {	//TESTING!!!!!!!!!!!!!!!!!!!!!!!
+					printf("There is no reference to the number of bytes, probably because it's stored in the cache, hence I will delay a little bit.\n");
+
+					//Delay
+					printf("Delaying html file\n");
+					sleep(5);
+					printf("Done delaying\n");
+
 					//Send response
+					/* Sending the HTTP response to the client */
+					int c_send_status;
+					c_send_status = send(data_sock, w_message_in_copy, sizeof(w_message_in_copy), 0);
+					if (c_send_status < 0) {
+						printf(
+								"Error in send() call for sending HTTP response to the client.\n");
+						exit(-1);
+					} else {
+						printf("## Sending HTTP response to the client: done ##\n");
+					}
+				}
+				//If you know the max bytes, then just ask for some at a time
+				else{
+
+					int sleepTime = atoi(maxBytes);
+					sleepTime = sleepTime / 100;
+
+					if (sleepTime <= 0) {
+						sleepTime = 5;
+					}
+
+					if (sleepTime > 20) {
+						sleepTime = 20;
+					}
+
+					printf("Delaying html file\n");
+					printf("%d\n", sleepTime );
+					sleep(sleepTime);
+					printf("Done delaying\n");
 
 					/* Sending the HTTP response to the client */
 					int c_send_status;
@@ -309,20 +342,8 @@ int main() {
 						exit(-1);
 					} else {
 						printf("## Sending HTTP response to the client: done ##\n");
-						printf("%s\n", w_message_in_copy );
 					}
 				}
-				//If you know the max bytes, then just ask for some at a time
-				else{
-					printf("To be finished\n");
-					printf("%s\n", maxBytes );
-					strcat(s_message_out, "Range: bytes=0-100\r\n");
-					printf("To be sent to the server: %s\n",s_message_out);
-
-
-
-				}
-
 				/* Closing the socket connection with the web server */
 				close(web_sock);
 			}
